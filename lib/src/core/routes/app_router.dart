@@ -8,6 +8,7 @@ import '../../features/decisions/presentation/screens/journal_editor_screen.dart
 import '../../features/decisions/presentation/screens/history_screen.dart';
 import '../../features/decisions/presentation/screens/category_management_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/search/presentation/screens/search_screen.dart';
 import '../../features_home_screen.dart';
 import 'app_routes.dart';
 
@@ -67,6 +68,10 @@ class AppRouter {
       case AppRoutes.categories:
         return MaterialPageRoute<void>(
           builder: (_) => const CategoryManagementScreen(),
+        );
+      case AppRoutes.search:
+        return MaterialPageRoute<void>(
+          builder: (_) => const SearchScreen(),
         );
       default:
         return MaterialPageRoute<void>(

@@ -32,9 +32,22 @@ class HistoryRepository {
     return maps.map(HistoryModel.fromMap).toList();
   }
 
-  Future<List<HistoryModel>> getAll({int limit = 200}) async {
+  Future<List<HistoryModel>> getAll({int limit = 200, String? searchQuery}) async {
+    final whereClauses = <String>[];
+    final whereArgs = <Object?>[];
+
+    if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+      whereClauses.add('(${AppDatabaseConstants.colHistoryEvent} LIKE ? OR ${AppDatabaseConstants.colHistoryPayload} LIKE ?)');
+      final q = '%${searchQuery.trim()}%';
+      whereArgs.addAll([q, q]);
+    }
+
+    final where = whereClauses.isEmpty ? null : whereClauses.join(' AND ');
+
     final maps = await db.query(
       AppDatabaseConstants.historyTable,
+      where: where,
+      whereArgs: whereArgs.isEmpty ? null : whereArgs,
       orderBy: '${AppDatabaseConstants.colHistoryCreatedAt} DESC',
       limit: limit,
     );

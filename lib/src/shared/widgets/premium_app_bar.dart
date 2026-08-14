@@ -54,7 +54,7 @@ class PremiumAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: actions ?? [
         IconButton(
-          onPressed: () {},
+          onPressed: () => Navigator.of(context).pushNamed('/search'),
           icon: const Icon(Icons.search),
           tooltip: 'Search',
         ),

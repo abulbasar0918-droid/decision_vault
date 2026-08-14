@@ -14,5 +14,6 @@ class AppRoutes {
   static const String history = '/history';
   static const String settings = '/settings';
   static const String categories = '/categories';
+  static const String search = '/search';
   static const String unknown = '/unknown';
 }

@@ -44,9 +44,22 @@ class JournalRepository {
     return JournalModel.fromMap(maps.first);
   }
 
-  Future<List<JournalModel>> getAll({int limit = 200}) async {
+  Future<List<JournalModel>> getAll({int limit = 200, String? searchQuery}) async {
+    final whereClauses = <String>[];
+    final whereArgs = <Object?>[];
+
+    if (searchQuery != null && searchQuery.trim().isNotEmpty) {
+      whereClauses.add('(${AppDatabaseConstants.colJournalTitle} LIKE ? OR ${AppDatabaseConstants.colJournalBody} LIKE ?)');
+      final q = '%${searchQuery.trim()}%';
+      whereArgs.addAll([q, q]);
+    }
+
+    final where = whereClauses.isEmpty ? null : whereClauses.join(' AND ');
+
     final maps = await db.query(
       AppDatabaseConstants.journalTable,
+      where: where,
+      whereArgs: whereArgs.isEmpty ? null : whereArgs,
       orderBy: '${AppDatabaseConstants.colJournalCreatedAt} DESC',
       limit: limit,
     );
