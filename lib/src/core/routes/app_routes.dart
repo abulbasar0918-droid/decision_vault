@@ -15,5 +15,6 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String categories = '/categories';
   static const String search = '/search';
+  static const String tags = '/tags';
   static const String unknown = '/unknown';
 }

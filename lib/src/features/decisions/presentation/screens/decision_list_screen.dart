@@ -142,6 +142,16 @@ class _FilterSummary extends StatelessWidget {
                   ),
                 ),
               ),
+            if (provider.tags.isNotEmpty)
+              ...provider.tags.map(
+                (tag) => FilterChip(
+                  label: Text(tag),
+                  selected: provider.selectedTag == tag,
+                  onSelected: (_) => provider.setSelectedTag(
+                    provider.selectedTag == tag ? null : tag,
+                  ),
+                ),
+              ),
           ],
         ),
       ],

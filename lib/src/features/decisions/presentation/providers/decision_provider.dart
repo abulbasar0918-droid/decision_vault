@@ -12,6 +12,7 @@ class DecisionProvider extends BaseProvider {
 
   String _searchQuery = '';
   String? _selectedCategory;
+  String? _selectedTag;
   bool _showFavoritesOnly = false;
   bool _showArchivedOnly = false;
   bool _initialized = false;
@@ -20,10 +21,11 @@ class DecisionProvider extends BaseProvider {
 
   String get searchQuery => _searchQuery;
   String? get selectedCategory => _selectedCategory;
+  String? get selectedTag => _selectedTag;
   bool get showFavoritesOnly => _showFavoritesOnly;
   bool get showArchivedOnly => _showArchivedOnly;
   bool get hasActiveFilters =>
-      _searchQuery.isNotEmpty || _selectedCategory != null || _showFavoritesOnly || _showArchivedOnly;
+      _searchQuery.isNotEmpty || _selectedCategory != null || _selectedTag != null || _showFavoritesOnly || _showArchivedOnly;
 
   List<DecisionModel> get filteredDecisions {
     final query = _searchQuery.trim().toLowerCase();
@@ -36,14 +38,21 @@ class DecisionProvider extends BaseProvider {
           (decision.notes?.toLowerCase().contains(query) ?? false);
 
       final matchesCategory = _selectedCategory == null || decision.category == _selectedCategory;
+      final matchesTag = _selectedTag == null || decision.tags.contains(_selectedTag);
       final matchesFavorite = !_showFavoritesOnly || decision.isFavorite;
       final matchesArchived = !_showArchivedOnly || decision.isArchived;
 
-      return matchesQuery && matchesCategory && matchesFavorite && matchesArchived;
+      return matchesQuery && matchesCategory && matchesTag && matchesFavorite && matchesArchived;
     }).toList(growable: false);
   }
 
   int get totalDecisions => _decisions.length;
+
+  List<String> get tags {
+    final tags = _decisions.expand((d) => d.tags).where((t) => t.trim().isNotEmpty).toSet().toList();
+    tags.sort();
+    return tags;
+  }
   int get activeDecisions => _decisions.where((decision) => !decision.isArchived).length;
   int get favoriteDecisions => _decisions.where((decision) => decision.isFavorite).length;
   int get archivedDecisions => _decisions.where((decision) => decision.isArchived).length;
@@ -185,6 +194,12 @@ class DecisionProvider extends BaseProvider {
     await loadDecisions();
   }
 
+  Future<void> setSelectedTag(String? tag) async {
+    _selectedTag = tag;
+    notifyListeners();
+    await loadDecisions();
+  }
+
   Future<void> setFavoritesOnly(bool value) async {
     _showFavoritesOnly = value;
     notifyListeners();
@@ -248,6 +263,35 @@ class DecisionProvider extends BaseProvider {
   /// Delete (clear) a category from decisions that reference it.
   Future<void> deleteCategory(String category) async {
     await renameCategory(category, null);
+  }
+
+  /// Rename a tag across all decisions that use [oldTag]. If [newTag] is null
+  /// or empty the tag will be removed from decisions.
+  Future<void> renameTag(String oldTag, String? newTag) async {
+    try {
+      clearError();
+      setLoading(true);
+      final repository = await _getRepository();
+      final updates = _decisions.where((d) => d.tags.contains(oldTag)).toList();
+      for (final d in updates) {
+        final newTags = d.tags
+            .map((t) => t == oldTag ? (newTag?.trim().isEmpty ?? true ? null : newTag) : t)
+            .whereType<String>()
+            .toSet()
+            .toList();
+        final updated = d.copyWith(tags: newTags, updatedAt: DateTime.now());
+        await repository.update(updated);
+      }
+      await loadDecisions();
+    } catch (error) {
+      setError('Unable to rename tag: $error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  Future<void> deleteTag(String tag) async {
+    await renameTag(tag, null);
   }
 
   Future<DecisionRepository> _getRepository() async {
