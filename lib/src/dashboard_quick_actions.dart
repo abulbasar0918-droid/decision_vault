@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'core/routes/app_routes.dart';
 
 class DashboardQuickActions extends StatelessWidget {
   const DashboardQuickActions({super.key});
@@ -6,10 +7,11 @@ class DashboardQuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actions = [
-      _ActionItem(icon: Icons.add, label: 'Create'),
-      _ActionItem(icon: Icons.upload_file, label: 'Import'),
-      _ActionItem(icon: Icons.share, label: 'Share'),
-      _ActionItem(icon: Icons.settings, label: 'Configure'),
+      _ActionItem(icon: Icons.add, label: 'Create', onPressed: () {}),
+      _ActionItem(icon: Icons.upload_file, label: 'Import', onPressed: () {}),
+      _ActionItem(icon: Icons.share, label: 'Share', onPressed: () {}),
+      _ActionItem(icon: Icons.settings, label: 'Configure', onPressed: () {}),
+      _ActionItem(icon: Icons.bar_chart, label: 'Statistics', onPressed: () => Navigator.pushNamed(context, AppRoutes.statistics)),
     ];
 
     return Wrap(
@@ -21,10 +23,11 @@ class DashboardQuickActions extends StatelessWidget {
 }
 
 class _ActionItem extends StatelessWidget {
-  const _ActionItem({required this.icon, required this.label});
+  const _ActionItem({required this.icon, required this.label, required this.onPressed});
 
   final IconData icon;
   final String label;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class _ActionItem extends StatelessWidget {
       width: 160,
       child: ElevatedButton.icon(
         style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-        onPressed: () {},
+        onPressed: onPressed,
         icon: Icon(icon),
         label: Text(label),
       ),

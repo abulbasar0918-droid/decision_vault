@@ -10,6 +10,7 @@ import '../../features/decisions/presentation/screens/category_management_screen
 import '../../features/decisions/presentation/screens/tag_management_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/search/presentation/screens/search_screen.dart';
+import '../../features/statistics/presentation/screens/statistics_screen.dart';
 import '../../features_home_screen.dart';
 import 'app_routes.dart';
 
@@ -77,6 +78,10 @@ class AppRouter {
       case AppRoutes.search:
         return MaterialPageRoute<void>(
           builder: (_) => const SearchScreen(),
+        );
+      case AppRoutes.statistics:
+        return MaterialPageRoute<void>(
+          builder: (_) => const StatisticsScreen(),
         );
       default:
         return MaterialPageRoute<void>(
